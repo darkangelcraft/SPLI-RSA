@@ -6,8 +6,9 @@ from random import randint
 import math
 import random 
 import sys
+import time
 
-filename = 'decrypted.jpg'
+filename = 'decrypted.png'
 PORT = 55710
 CHUNK_DIM=6
 
@@ -17,13 +18,17 @@ def itos(n, length):
     while (length - len(stringa)) > 0 :
         stringa = '0'+stringa
     return stringa
-'''
-def itob(n, length):
+
+def myzfill(n, length):
     stringa = str(n)
     while (length - len(stringa)) > 0 :
         stringa = '0'+stringa
     return stringa.encode('ascii')
-	
+'''
+def myzfill(n, len):
+    string=str(n)
+    string= string.zfill(len)
+    return string.encode('ascii')	
 def rabinMiller(n):
      s = n-1
      t = 0
@@ -96,7 +101,7 @@ def wait_for_bob():
 	
 def ack_for_bob():
 	#SPLI print("Ack inviato a Bob")
-	new_sock.send(itob(N,6))	
+	new_sock.send(myzfill(N,6))	
 	
 	
 	
@@ -109,22 +114,22 @@ def ack_for_bob():
 sock = mysocket.mysocket()
 sock.bind("localhost", PORT)
 sock.listen(5)
-print "Server on."
-print "Waiting for connection..."
+print("Server on.")
+print("Waiting for connection...")
 new_sock, address = sock.accept()
-print "Connessione stabilita con: ", address
+print("Connessione stabilita con: ", address)
 new_sock = mysocket.mysocket(new_sock)
 
 #####################################################################
 #####################################################################
 P = generateLargePrime(6)	#P ha 16 cifre
 Q = generateLargePrime(6)	#Q ha 16 cifre
-print "Questo e' P: %d " % P
-print "Questo e' Q: %d " % Q
+print("Questo e' P: %d " % P)
+print("Questo e' Q: %d " % Q)
 N = mpz(P*Q)					# N di alice
-print "Questo e' N: %d " % N
+print("Questo e' N: %d " % N)
 fi_eulero = eulero(P,Q)
-print "fi e': %d " % fi_eulero
+print("fi e': %d " % fi_eulero)
 #calcolo random 1 < e < fi(n)
 E = random.randint(2,fi_eulero-1)	
 flag= True
@@ -136,23 +141,23 @@ while(flag):
 	except:
 		vito=True
 
-print "Questo e' E: %d " % E
-print "Questo e' D: %d " % D
+print("Questo e' E: %d " % E)
+print("Questo e' D: %d " % D)
 
-new_sock.send(itob(N,6))	#mando N ed E come stringhe da 16 caratteri
-new_sock.send(itob(E,6))
-print "Mando N ed E a Bob"
+new_sock.send(myzfill(N,6))	#mando N ed E come stringhe da 16 caratteri
+new_sock.send(myzfill(E,6))
+print("Mando N ed E a Bob")
 #SPLI print(N)
 #SPLI print(E)
 
 #print("Aspetto ack da Bob")
 #ack0 = mpz((new_sock.receive(16)))		
 
-print "Attendo num_chunk da Bob"
+print("Attendo num_chunk da Bob")
 chunk_num = int(new_sock.receive(100))	#ricevo num_chunk come stringa da 100 caratteri
-print "Num_chunk dell'immagine di Bob: %d" %chunk_num
+print("Num_chunk dell'immagine di Bob: %d" %chunk_num)
 #print(chunk_num)
-print "Comincio a decifrare!"
+print("Comincio a decifrare!")
 
 #wait bob 1 
 #wait_for_bob()
@@ -160,9 +165,10 @@ print "Comincio a decifrare!"
 #wait_for_bob()
 decifrato = BitStream()
 for i in range(chunk_num):
+	print str(i)+'/'+str(chunk_num)
 	#SPLI print("Entro nel for %d" %i)
 	ack_for_bob()
-#	new_sock.send(itob(N,16))
+#	new_sock.send(myzfill(N,16))
 	chunk = int(new_sock.receive(5000))
 	ack_for_bob()
 	#SPLI print("Ricevo %d" %chunk)
@@ -175,10 +181,13 @@ for i in range(chunk_num):
 	#wait bob 2
 	wait_for_bob()	#attendo 16 caratteri da Bob
 	
+
+time.sleep(4)
 decifrato = decifrato.bytes
 received_file = open(filename, 'wb')
 received_file.write(decifrato)
 received_file.close()
 
-print "Operazione completata" 
+print("Operazione completata")
+time.sleep(5)
 exit()

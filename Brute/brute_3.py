@@ -12,17 +12,21 @@ import random
 #FUNZIONI
 #
 ####################################################
-
+def myzfill(n, len):
+    string=str(n)
+    string= string.zfill(len)
+    return string.encode('ascii')
+'''
 def itos(n, length):
     stringa = str(n)
     while (length - len(stringa)) > 0 :
         stringa = '0'+stringa
     return stringa
 
-def itob(n, length):
+def myzfill(n, length):
     stringa = itos(n, length)
     return stringa.encode('ascii')
-
+'''
 def rabinMiller(n):
      s = n-1
      t = 0
@@ -100,11 +104,11 @@ def factor(n):
 
 def wait_for_bob():
 	print("In attesa di Bob")
-	ack = mpz((sock.receive(16)))	
+	ack = mpz((sock.receive(6)))	
 	
 def ack_for_bob():
 	print("Ack inviato a Bob")
-	sock.send(itob(N,16))				
+	sock.send(myzfill(N,6))				
 
 ####################################################
 #	
@@ -114,11 +118,10 @@ def ack_for_bob():
 
 #Preparativi
 #PARTE DI CONNESSIONE VERSO BOB
-filename = 'decrypted.jpg'
-#BOB = "192.168.56.103" #INDIRIZZO DI BOB
+filename = 'decrypted.png'
 BOB = "localhost" #INDIRIZZO DI BOB
-PORT = 55710 
-CHUNK_DIM = 16
+PORT = 55711 
+CHUNK_DIM = 6
 
 
 #Bob sta aspettando mi connetta a lui
@@ -129,9 +132,9 @@ print("Connesso a %s:%d" % (BOB, PORT))
 
 #Attendo N ed E
 print("Attendo N, E, num_chunk")
-N = mpz((sock.receive(16)))				# ricevo N
+N = mpz((sock.receive(6)))				# ricevo N
 print("Ho ricevuto N %d" % N)
-E = mpz((sock.receive(16)))				# ricevo E
+E = mpz((sock.receive(6)))				# ricevo E
 print("Ho ricevuto E %d" % E)
 
 #ack 1 per bob
@@ -183,9 +186,9 @@ for i in range(chunk_num):
 	print("Ricevo %d" %chunk)
 	de_file = pow(chunk, D, N)
 	if i==0:
-		decifrato=BitStream(uint=de_file, length=16)
+		decifrato=BitStream(uint=de_file, length=6)
 	else:
-		de_file=BitStream(uint=de_file, length=16)		
+		de_file=BitStream(uint=de_file, length=6)		
 		decifrato.append(de_file) # da modificare, usare metodo append di BitStream
 	wait_for_bob()
 
