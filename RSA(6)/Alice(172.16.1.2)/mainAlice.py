@@ -8,9 +8,9 @@ import random
 import sys
 import time
 
-filename = 'decrypted.png'
+filename = 'decrypted.jpg'
 PORT = 55710
-CHUNK_DIM=6
+CHUNK_DIM=8
 
 '''
 def itos(n, length):
@@ -97,11 +97,11 @@ def eulero(p,q):
 	
 def wait_for_bob():
 	#SPLI print("In attesa di Bob")
-	ack = mpz((new_sock.receive(6)))	
+	ack = mpz((new_sock.receive(8)))
 	
 def ack_for_bob():
 	#SPLI print("Ack inviato a Bob")
-	new_sock.send(myzfill(N,6))	
+	new_sock.send(myzfill(N,8))
 	
 	
 	
@@ -122,8 +122,8 @@ new_sock = mysocket.mysocket(new_sock)
 
 #####################################################################
 #####################################################################
-P = generateLargePrime(6)	#P ha 16 cifre
-Q = generateLargePrime(6)	#Q ha 16 cifre
+P = generateLargePrime(8)	#P ha 16 cifre
+Q = generateLargePrime(8)	#Q ha 16 cifre
 print("Questo e' P: %d " % P)
 print("Questo e' Q: %d " % Q)
 N = mpz(P*Q)					# N di alice
@@ -144,8 +144,8 @@ while(flag):
 print("Questo e' E: %d " % E)
 print("Questo e' D: %d " % D)
 
-new_sock.send(myzfill(N,6))	#mando N ed E come stringhe da 16 caratteri
-new_sock.send(myzfill(E,6))
+new_sock.send(myzfill(N,8))	#mando N ed E come stringhe da 16 caratteri
+new_sock.send(myzfill(E,8))
 print("Mando N ed E a Bob")
 #SPLI print(N)
 #SPLI print(E)
@@ -174,20 +174,20 @@ for i in range(chunk_num):
 	#SPLI print("Ricevo %d" %chunk)
 	de_file = pow(chunk, D, N)	# C^D (mod N)
 	if i==0:
-		decifrato=BitStream(uint=de_file, length=6)
+		decifrato=BitStream(uint=de_file, length=8)
 	else:
-		de_file=BitStream(uint=de_file, length=6)		
+		de_file=BitStream(uint=de_file, length=8)
 		decifrato.append(de_file) # da modificare, usare metodo append di BitStream
 	#wait bob 2
 	wait_for_bob()	#attendo 16 caratteri da Bob
 	
 
-time.sleep(4)
+time.sleep(1)
 decifrato = decifrato.bytes
 received_file = open(filename, 'wb')
 received_file.write(decifrato)
 received_file.close()
 
 print("Operazione completata")
-time.sleep(5)
+time.sleep(1)
 exit()
