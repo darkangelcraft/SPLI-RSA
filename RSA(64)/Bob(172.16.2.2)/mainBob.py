@@ -1,8 +1,8 @@
+import sys
+
 from bitstring import *
 from gmpy2 import *
-from random import randint
-import struct
-import sys
+
 #from socket import *
 import mysocket
 #import socket
