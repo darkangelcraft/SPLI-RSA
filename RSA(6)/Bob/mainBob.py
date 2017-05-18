@@ -1,3 +1,4 @@
+import sys
 from bitstring import *
 from gmpy2 import *
 from random import randint

@@ -173,7 +173,7 @@ for i in range(chunk_num):
 		de_file=BitStream(uint=de_file, length=16)		
 		decifrato.append(de_file) # da modificare, usare metodo append di BitStream
 	#wait bob 2
-	print "chunk n.%d of %d" %((i+1),num_chunk)
+	print "chunk n.%d of %d" %((i+1),chunk_num)
 	wait_for_bob()	#attendo 16 caratteri da Bob
 	
 decifrato = decifrato.bytes
