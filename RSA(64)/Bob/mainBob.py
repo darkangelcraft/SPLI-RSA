@@ -24,11 +24,11 @@ def itob(n, length):
 
 
 def wait_for_oracle():
-	print("In attesa di Oracle")
+	print "In attesa di Oracle"
 	ack = mpz((new_sockoracle.receive(16)))	
 	
 def ack_for_oracle():
-	print("Ack inviato ad Oracle")
+	print "Ack inviato ad Oracle"
 	new_sockoracle.send(itob(N,16))	
 	
 def wait_for_alice():
@@ -55,11 +55,11 @@ CHUNK_DIM = 16
 try:
 	image = BitStream(filename = './book.png')
 except IOError:
-	print('Immagine non trovata.')
+	print 'Immagine non trovata.'
 	sys.exit(0)
 
 image_len = image.length
-print("Immagine caricata: %d Bits" % image_len)
+print "Immagine caricata: %d Bits" % image_len
 
 #FACCIO UN PADDING
 resto = image_len % CHUNK_DIM	# verifico che il numero di bits dell'immagine sia multiplo esatto di CHUNK_DIM=16
@@ -67,12 +67,12 @@ if (resto != 0 ):
 	for i in range(CHUNK_DIM - resto):
 		image.append('0b0')
 	image_len = image.length
-	print('L\'immagine e\' stata modificata.')	
-	print("Immagine : %d Bits" % image_len)
+	print 'L\'immagine e\' stata modificata.'
+	print "Immagine : %d Bits" % image_len
 	
 #controllo di quanti chunk e' formata l'immagine
 num_chunk = image_len/CHUNK_DIM
-print('La nostra immagine e\' composta da: %d chunk, ciascuno di 16 bits' % num_chunk)
+print 'La nostra immagine e\' composta da: %d chunk, ciascuno di 16 bits' % num_chunk
 
 '''
 #Aspetto Oracle
@@ -89,17 +89,17 @@ new_sockoracle = mysocket.mysocket(new_sockoracle)
 
 #Mi collego ad Alice
 sock = mysocket.mysocket()
-print("Inizio la connessione:")
+print "Inizio la connessione:"
 #SPLI sock.connect(ALICE, PORT)
 sock.connect("localhost", PORT)
-print("Connesso ad Alice, PORT %d" % PORT)
+print "Connesso ad Alice, PORT %d" % PORT
 
 # (mpz() serve per gestire numeri grandi in python)
 N = mpz((sock.receive(16)))	# ricevo N da 16 caratteri
 E = mpz((sock.receive(16)))	# ricevo E da 16 caratteri
 
-print("Ho ricevuto N da Alice: %d" % N)
-print("Ho ricevuto E da Alice: %d" % E)
+print "Ho ricevuto N da Alice: %d" % N
+print "Ho ricevuto E da Alice: %d" % E
 
 #####################################################
 #####################################################
@@ -117,7 +117,7 @@ wait_for_oracle()
 ####################################################
 
 #mando il numero di chunk che compone l' immagine a Alice 
-print("Ho inviato num_chunk ad Alice %d" % num_chunk)
+print "Ho inviato num_chunk ad Alice %d" % num_chunk
 sock.send(itob(num_chunk,100)) 
 
 '''
@@ -142,7 +142,7 @@ for i in range(num_chunk):
 	chunk_to_int =chunk.uint	#converto in uint i 16 caratteri dell'immagine appena letti
 	###################
 	if chunk_to_int >= N:
-		print("ERROR: chunk_to_int >= N ")
+		print "ERROR: chunk_to_int >= N "
 		exit()
 	en_file = pow(chunk_to_int, E, N)	#M^e (mod N)
 	wait_for_alice()	#attendo un ack da Alice di 16 caratteri
@@ -155,9 +155,9 @@ for i in range(num_chunk):
 	#SPLI	new_sockoracle.send(itob(en_file,5000))
 	#SPLI	wait_for_oracle()
 	#SPLI	ack_for_oracle()
-	print"chunk n.%d of %d" %((i+1),num_chunk)
+	print "chunk n.%d of %d" %((i+1),num_chunk)
 	ack_for_alice()	# trasmetto l'ack di 16 caratteri ad Alice 
 	#SPLI	ack_for_oracle()
 
-print("Operazione completata")
+print "Operazione completata"
 exit()
