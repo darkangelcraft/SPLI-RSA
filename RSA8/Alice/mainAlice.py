@@ -10,21 +10,8 @@ import time
 
 filename = 'decrypted.jpg'
 PORT = 55710
-CHUNK_DIM=8
+CHUNK_DIM=14
 
-'''
-def itos(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa
-
-def myzfill(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa.encode('ascii')
-'''
 def myzfill(n, len):
     string=str(n)
     string= string.zfill(len)
@@ -122,8 +109,8 @@ new_sock = mysocket.mysocket(new_sock)
 
 #####################################################################
 #####################################################################
-P = generateLargePrime(8)	#P ha 16 cifre
-Q = generateLargePrime(8)	#Q ha 16 cifre
+P = generateLargePrime(8)	#P ha 8 cifre
+Q = generateLargePrime(8)	#Q ha 8 cifre
 print("Questo e' P: %d " % P)
 print("Questo e' Q: %d " % Q)
 N = mpz(P*Q)					# N di alice
@@ -174,20 +161,29 @@ for i in range(chunk_num):
 	#SPLI print("Ricevo %d" %chunk)
 	de_file = pow(chunk, D, N)	# C^D (mod N)
 	if i==0:
-		decifrato=BitStream(uint=de_file, length=8)
+		decifrato=BitStream(uint=de_file, length=CHUNK_DIM)
 	else:
-		de_file=BitStream(uint=de_file, length=8)
+		de_file=BitStream(uint=de_file, length=CHUNK_DIM)
 		decifrato.append(de_file) # da modificare, usare metodo append di BitStream
 	#wait bob 2
 	wait_for_bob()	#attendo 16 caratteri da Bob
 	
 
 time.sleep(1)
+#scrittura su file del contenuto decriptato
+try:
+    f=open(filename, 'wb')
+    BitStream(decifrato).tofile(f)
+    f.close()
+except IOError:
+    print("Cannot save the decrypted file\n'")
+    sys.exit(-3)
+'''
 decifrato = decifrato.bytes
 received_file = open(filename, 'wb')
 received_file.write(decifrato)
 received_file.close()
-
-print("Operazione completata")
+'''
+print("\033[93mOperazione completata\033[0m")
 time.sleep(1)
 exit()

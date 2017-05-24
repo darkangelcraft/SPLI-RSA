@@ -11,18 +11,10 @@ filename = 'decrypted.jpg'
 PORT = 55710
 CHUNK_DIM=16
 
-'''
-def itos(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa
-'''
-def itob(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa.encode('ascii')
+def myzfill(n, len):
+    string=str(n)
+    string= string.zfill(len)
+    return string.encode('ascii')
 	
 def rabinMiller(n):
      s = n-1
@@ -96,7 +88,7 @@ def wait_for_bob():
 	
 def ack_for_bob():
 	#SPLI print("Ack inviato a Bob")
-	new_sock.send(itob(N,16))	
+	new_sock.send(myzfill(N,16))	
 	
 	
 	
@@ -105,6 +97,7 @@ def ack_for_bob():
 #INIZIA NOSTRO PROGRAMMA
 
 #####################################################################
+CHUNK_DIM=28
 
 sock = mysocket.mysocket()
 sock.bind("localhost", PORT)
@@ -139,8 +132,8 @@ while(flag):
 print "Questo e' E: %d " % E
 print "Questo e' D: %d " % D
 
-new_sock.send(itob(N,16))	#mando N ed E come stringhe da 16 caratteri
-new_sock.send(itob(E,16))
+new_sock.send(myzfill(N,16))	#mando N ed E come stringhe da 16 caratteri
+new_sock.send(myzfill(E,16))
 print "Mando N ed E a Bob"
 #SPLI print(N)
 #SPLI print(E)
@@ -162,24 +155,33 @@ decifrato = BitStream()
 for i in range(chunk_num):
 	#SPLI print("Entro nel for %d" %i)
 	ack_for_bob()
-#	new_sock.send(itob(N,16))
+#	new_sock.send(myzfill(N,16))
 	chunk = int(new_sock.receive(5000))
 	ack_for_bob()
 	#SPLI print("Ricevo %d" %chunk)
 	de_file = pow(chunk, D, N)	# C^D (mod N)
 	if i==0:
-		decifrato=BitStream(uint=de_file, length=16)
+		decifrato=BitStream(uint=de_file, length=CHUNK_DIM)
 	else:
-		de_file=BitStream(uint=de_file, length=16)		
+		de_file=BitStream(uint=de_file, length=CHUNK_DIM)		
 		decifrato.append(de_file) # da modificare, usare metodo append di BitStream
 	#wait bob 2
 	print "chunk n.%d of %d" %((i+1),chunk_num)
 	wait_for_bob()	#attendo 16 caratteri da Bob
-	
+'''	
 decifrato = decifrato.bytes
 received_file = open(filename, 'wb')
 received_file.write(decifrato)
 received_file.close()
+'''
+#scrittura su file del contenuto decriptato
+try:
+    f=open(filename, 'wb')
+    BitStream(decifrato).tofile(f)
+    f.close()
+except IOError:
+    print("Cannot save the decrypted file\n'")
+    sys.exit(-3)
 
-print "Operazione completata"
+print("\033[93mOperazione completata\033[0m")
 exit()

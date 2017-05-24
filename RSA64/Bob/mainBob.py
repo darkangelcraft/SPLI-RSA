@@ -12,24 +12,18 @@ import mysocket
 #
 ####################################################
 
-def itos(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa
-
-def itob(n, length):
-    stringa = itos(n, length)
-    return stringa.encode('ascii')
-
+def myzfill(n, len):
+    string=str(n)
+    string= string.zfill(len)
+    return string.encode('ascii')
 
 def wait_for_oracle():
-	print "In attesa di Oracle"
+	print "In attesa"
 	ack = mpz((new_sockoracle.receive(16)))	
 	
 def ack_for_oracle():
-	print "Ack inviato ad Oracle"
-	new_sockoracle.send(itob(N,16))	
+	print "Ack inviato"
+	new_sockoracle.send(myzfill(N,16))	
 	
 def wait_for_alice():
 	#SPLI print("In attesa di Alice")
@@ -37,7 +31,7 @@ def wait_for_alice():
 	
 def ack_for_alice():
 	#SPLI print("Ack inviato ad Alice")
-	sock.send(itob(N,16))	
+	sock.send(myzfill(N,16))	
 	
 
 ####################################################
@@ -49,11 +43,11 @@ def ack_for_alice():
 #ALICE = "192.168.56.101"
 ALICE = "192.168.56.101"
 PORT = 55710
-CHUNK_DIM = 16
+CHUNK_DIM = 28
 
 #Apro L'immagine da dovere cifrare
 try:
-	image = BitStream(filename = './book.png')
+	image = BitStream(filename = './rsa.jpg')
 except IOError:
 	print 'Immagine non trovata.'
 	sys.exit(0)
@@ -105,9 +99,9 @@ print "Ho ricevuto E da Alice: %d" % E
 #####################################################
 #li invio a Oracle!
 '''
-new_sockoracle.send(itob(N,16))
+new_sockoracle.send(myzfill(N,16))
 print("Ho inviato N ad Orwell %d" % N)
-new_sockoracle.send(itob(E,16))
+new_sockoracle.send(myzfill(E,16))
 print("Ho inviato E ad Orwell %d" % E)
 
 #Attesa 1 per Oracle
@@ -118,12 +112,12 @@ wait_for_oracle()
 
 #mando il numero di chunk che compone l' immagine a Alice 
 print "Ho inviato num_chunk ad Alice %d" % num_chunk
-sock.send(itob(num_chunk,100)) 
+sock.send(myzfill(num_chunk,100)) 
 
 '''
 #l invio anche ad oracle!
 print("Ho inviato num_chunk ad Orwell %d" % num_chunk)
-new_sockoracle.send(itob(num_chunk,100)) 
+new_sockoracle.send(myzfill(num_chunk,100)) 
 '''
 '''
 #Attesa 2 per Oracle
@@ -138,7 +132,7 @@ for i in range(num_chunk):
 	#ack_for_alice()
 	#ack_for_oracle()
 	#SPLI print("Ciclo %d" %i)
-	chunk = BitStream(bin = image.read('bin:16'))	#leggo 16 caratteri dell'immagine
+	chunk = BitStream(bin = image.read('bin:'+str(CHUNK_DIM)))	#leggo 16 caratteri dell'immagine
 	chunk_to_int =chunk.uint	#converto in uint i 16 caratteri dell'immagine appena letti
 	###################
 	if chunk_to_int >= N:
@@ -147,17 +141,17 @@ for i in range(num_chunk):
 	en_file = pow(chunk_to_int, E, N)	#M^e (mod N)
 	wait_for_alice()	#attendo un ack da Alice di 16 caratteri
 	#SPLI print("Mando ad Alice: %d" %en_file)
-	sock.send(itob(en_file,5000))	#trasmetto 5000 caratteri
+	sock.send(myzfill(en_file,5000))	#trasmetto 5000 caratteri
 	wait_for_alice()	#attendo la conferma di Alice
 	
 	#SPLI	wait_for_oracle()
 	#SPLI	print("Mando ad Oracle: %d" %en_file)
-	#SPLI	new_sockoracle.send(itob(en_file,5000))
+	#SPLI	new_sockoracle.send(myzfill(en_file,5000))
 	#SPLI	wait_for_oracle()
 	#SPLI	ack_for_oracle()
 	print "chunk n.%d of %d" %((i+1),num_chunk)
 	ack_for_alice()	# trasmetto l'ack di 16 caratteri ad Alice 
 	#SPLI	ack_for_oracle()
 
-print "Operazione completata"
+print("\033[93mOperazione completata\033[0m")
 exit()

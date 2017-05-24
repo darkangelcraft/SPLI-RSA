@@ -12,27 +12,17 @@ import mysocket
 #
 ####################################################
 
-#def itos(n, length):
-#    stringa = str(n)
-#    while (length - len(stringa)) > 0 :
-#        stringa = '0'+stringa
-#    return stringa
-
-#def myzfill(n, length):
-#    stringa = itos(n, length)
-#    return stringa.encode('ascii')
-
 def myzfill(n, len):
 	string=str(n)
 	string= string.zfill(len)
 	return string.encode('ascii')
 
 def wait_for_oracle():
-	print("In attesa di Oracle")
+	print("In attesa")
 	ack = mpz((new_sockoracle.receive(8)))
 	
 def ack_for_oracle():
-	print("Ack inviato ad Oracle")
+	print("Ack inviato")
 	new_sockoracle.send(myzfill(N,8))
 	
 def wait_for_alice():
@@ -54,7 +44,7 @@ ALICE = "localhost"
 PORT = 55710
 PORT1 = 55711
 
-CHUNK_DIM = 8
+CHUNK_DIM =14
 
 #Apro L'immagine da dovere cifrare
 try:
@@ -143,20 +133,22 @@ for i in range(num_chunk):
 	#ack_for_alice()
 	#ack_for_oracle()
 	#SPLI print("Ciclo %d" %i)
-	chunk = BitStream(bin = image.read('bin:8'))	#leggo 16 caratteri dell'immagine
+	chunk = BitStream(bin = image.read('bin:'+str(CHUNK_DIM)))	#leggo 16 caratteri dell'immagine
+	print chunk
 	chunk_to_int =chunk.uint	#converto in uint i 16 caratteri dell'immagine appena letti
+	print chunk_to_int
 	###################
 	if chunk_to_int >= N:
-		print("ERROR: chunk_to_int >= N ")
+		print("ERROR: chunk_to_int >= N (%d>=%d)"%(chunk_to_int,N))
 		exit()
 	en_file = pow(chunk_to_int, E, N)	#M^e (mod N)
+	print en_file
 	wait_for_alice()	#attendo un ack da Alice di 16 caratteri
 	#SPLI print("Mando ad Alice: %d" %en_file)
 	sock.send(myzfill(en_file,5000))	#trasmetto 5000 caratteri
 	wait_for_alice()	#attendo la conferma di Alice
 	
 	wait_for_oracle()
-	print("Mando ad Oracle: %d" %en_file)
 	new_sockoracle.send(myzfill(en_file,5000))
 	wait_for_oracle()
 	#ack_for_oracle()
@@ -164,5 +156,5 @@ for i in range(num_chunk):
 	ack_for_alice()	# trasmetto l'ack di 16 caratteri ad Alice 
 	ack_for_oracle()
 
-print("Operazione completata")
+print("\033[93mOperazione completata\033[0m")
 exit()

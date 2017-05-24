@@ -21,20 +21,6 @@ def myzfill(n, len):
     string = string.zfill(len)
     return string.encode('ascii')
 
-
-'''
-def itos(n, length):
-    stringa = str(n)
-    while (length - len(stringa)) > 0 :
-        stringa = '0'+stringa
-    return stringa
-
-def myzfill(n, length):
-    stringa = itos(n, length)
-    return stringa.encode('ascii')
-'''
-
-
 def rabinMiller(n):
     s = n - 1
     t = 0
@@ -133,11 +119,12 @@ def ack_for_bob():
 
 # Preparativi
 # PARTE DI CONNESSIONE VERSO BOB
-filename = 'decrypted.png'
+filename = 'decrypted.jpg'
 BOB = "localhost"  # INDIRIZZO DI BOB
 PORT = 55711
-CHUNK_DIM = 8
+CHUNK_DIM = 14
 
+t1=time.time()
 # Bob sta aspettando mi connetta a lui
 sock = mysocket.mysocket()
 print("Inizio la connessione:")
@@ -178,6 +165,14 @@ while (flag):
         vito = True
 print("Questo e' D: %d " % D)
 
+
+##############################
+f=open("log.txt", 'ab')
+f.write("D--->"+str(D)+"    N--->"+str(N)+"\n")
+f.close()
+
+##############################
+t2=time.time()
 # ack 2 per bob
 ack_for_bob()
 
@@ -187,7 +182,6 @@ ack_for_bob()
 # wait_for_bob()
 print("Comincio a decifrare!")
 
-t1=time.time()
 # Decifratura
 decifrato = BitStream()
 print("Num_chunk e' %d" % chunk_num)
@@ -199,16 +193,31 @@ for i in range(chunk_num):
     print("Ricevo %d" % chunk)
     print "\n"
     de_file = pow(chunk, D, N)
+    print ("DE_file:: %d"%de_file)
     if i == 0:
-        decifrato = BitStream(uint=de_file, length=8)
+        decifrato = BitStream(uint=de_file, length=CHUNK_DIM)
     else:
-        de_file = BitStream(uint=de_file, length=8)
+        de_file = BitStream(uint=de_file, length=CHUNK_DIM)
         decifrato.append(de_file)  # da modificare, usare metodo append di BitStream
     wait_for_bob()
 
+#scrittura su file del contenuto decriptato
+try:
+    f=open(filename, 'wb')
+    BitStream(decifrato).tofile(f)
+    f.close()
+except IOError:
+    print("Cannot save the decrypted file\n'")
+    sys.exit(-3)
+
+t3=time.time()
+print("Operazione completata\n Tempo impiegato per trovare D %.7f "%(t2-t1)+" sec.")
+print("Tempo impiegato (totale) %.7f "%(t3-t1)+" sec.")
+'''
 decifrato = decifrato.bytes
 received_file = open(filename, 'wb')
 received_file.write(decifrato)
 received_file.close()
+'''
 
-print("Operazione completata")
+print("\033[93mOperazione completata\033[0m")
